@@ -34,7 +34,7 @@ func openMySQLVip(vip *viper.Viper) (*gorm.DB, error) {
 		user        = vip.GetString("user")
 		pass        = vip.GetString("pass")
 		host        = vip.GetString("host")
-		port        = vip.GetString("port")
+		port        = vip.GetInt("port")
 		dbname      = vip.GetString("database")
 		charset     = vip.GetString("charset")
 		parseTime   = vip.GetBool("parseTime")
