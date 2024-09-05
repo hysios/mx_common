@@ -7,8 +7,8 @@ require (
 	github.com/go-oauth2/oauth2/v4 v4.5.2
 	github.com/hysios/mx v0.0.3
 	github.com/redis/go-redis/v9 v9.5.2
-	github.com/spf13/viper v1.17.0
-	google.golang.org/grpc v1.58.3
+	github.com/spf13/viper v1.15.0
+	google.golang.org/grpc v1.54.0
 	gorm.io/driver/mysql v1.4.7
 	gorm.io/driver/sqlite v1.4.4
 	gorm.io/gorm v1.24.6
