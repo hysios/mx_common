@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/hysios/mx/config"
+	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -34,6 +35,16 @@ func DbDialet(cfg *config.Config) string {
 	var (
 		prefix  = "database."
 		driver  = cfg.Str(prefix + "driver")
+		dialect = prefix + driver + "."
+	)
+
+	return dialect
+}
+
+func DbDialetVip() string {
+	var (
+		prefix  = "database."
+		driver  = viper.GetString(prefix + "driver")
 		dialect = prefix + driver + "."
 	)
 

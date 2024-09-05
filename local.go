@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -87,4 +88,14 @@ func openSQLiteVip(vip *viper.Viper) (*gorm.DB, error) {
 	)
 
 	return gorm.Open(sqlite.Open(file), &gorm.Config{})
+}
+
+func OpenRedisVip() *redis.Client {
+	return redis.NewClient(&redis.Options{
+		Network: viper.GetString("redis.network"),
+		Addr:    viper.GetString("redis.addr"),
+		DB:      viper.GetInt("redis.db"),
+		// Username: cfg.Str("redis.username"),
+		Password: viper.GetString("redis.password"),
+	})
 }
