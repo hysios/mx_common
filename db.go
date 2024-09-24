@@ -109,14 +109,15 @@ func openMySQL(cfg *config.Config, dialect string) (*gorm.DB, error) {
 
 func openPostgres(cfg *config.Config, dialect string) (*gorm.DB, error) {
 	var (
-		user     = cfg.Str(dialect + "user")
-		pass     = cfg.Str(dialect + "pass")
-		host     = cfg.Str(dialect + "host")
-		port     = cfg.Int(dialect + "port")
-		dbname   = cfg.Str(dialect + "database")
-		timezone = cfg.Str(dialect + "timezone")
-		sslmode  = cfg.Str(dialect + "sslmode")
-		dsn      = fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=%s TimeZone=%s", host, port, user, dbname, pass, sslmode, timezone)
+		user   = cfg.Str(dialect + "user")
+		pass   = cfg.Str(dialect + "pass")
+		host   = cfg.Str(dialect + "host")
+		port   = cfg.Int(dialect + "port")
+		dbname = cfg.Str(dialect + "database")
+		// timezone = cfg.Str(dialect + "timezone")
+		// sslmode  = cfg.Str(dialect + "sslmode")
+		//dsn: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+		dsn = fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?", user, pass, host, port, dbname)
 	)
 
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
