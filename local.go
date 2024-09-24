@@ -6,6 +6,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	glogger "gorm.io/gorm/logger"
@@ -79,7 +80,7 @@ func openPostgresVip(vip *viper.Viper) (*gorm.DB, error) {
 		dsn      = fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=%s TimeZone=%s", host, port, user, dbname, pass, sslmode, timezone)
 	)
 
-	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
 }
 
 func openSQLiteVip(vip *viper.Viper) (*gorm.DB, error) {
