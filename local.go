@@ -5,6 +5,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
+	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -21,17 +22,19 @@ func OpenDatabaseVip() (*gorm.DB, error) {
 
 	switch driver {
 	case "mysql":
-		return openMySQLVip(viper.Sub(dialect))
+		return OpenMySQLVip(viper.Sub(dialect))
 	case "postgres":
-		return openPostgresVip(viper.Sub(dialect))
+		return OpenPostgresVip(viper.Sub(dialect))
 	case "sqlite":
-		return openSQLiteVip(viper.Sub(dialect))
+		return OpenSQLiteVip(viper.Sub(dialect))
+	case "clickhouse":
+		return OpenClickhouseVip(viper.Sub(dialect))
 	default:
 		return nil, fmt.Errorf("unsupported database driver: %s", driver)
 	}
 }
 
-func openMySQLVip(vip *viper.Viper) (*gorm.DB, error) {
+func OpenMySQLVip(vip *viper.Viper) (*gorm.DB, error) {
 	var (
 		user        = vip.GetString("user")
 		pass        = vip.GetString("pass")
@@ -68,7 +71,7 @@ func openMySQLVip(vip *viper.Viper) (*gorm.DB, error) {
 	return gorm.Open(mysql.Open(dsn), gormcfg)
 }
 
-func openPostgresVip(vip *viper.Viper) (*gorm.DB, error) {
+func OpenPostgresVip(vip *viper.Viper) (*gorm.DB, error) {
 	var (
 		user     = vip.GetString("user")
 		pass     = vip.GetString("pass")
@@ -83,7 +86,7 @@ func openPostgresVip(vip *viper.Viper) (*gorm.DB, error) {
 	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
 }
 
-func openSQLiteVip(vip *viper.Viper) (*gorm.DB, error) {
+func OpenSQLiteVip(vip *viper.Viper) (*gorm.DB, error) {
 	var (
 		file = vip.GetString("file")
 	)
@@ -99,4 +102,20 @@ func OpenRedisVip() *redis.Client {
 		// Username: cfg.Str("redis.username"),
 		Password: viper.GetString("redis.password"),
 	})
+}
+
+func OpenClickhouseVip(vip *viper.Viper) (*gorm.DB, error) {
+	var (
+		user    = vip.GetString("user")
+		pass    = vip.GetString("pass")
+		host    = vip.GetString("host")
+		port    = vip.GetInt("port")
+		dbname  = vip.GetString("database")
+		timeout = vip.GetDuration("timeout")
+		read    = vip.GetDuration("read")
+	)
+
+	dsn := fmt.Sprintf("clickhouse://%s:%s@%s:%d?%s&dial_timeout=%s&read_timeout=%s", host, port, user, pass, dbname, timeout, read)
+
+	return gorm.Open(clickhouse.Open(dsn), &gorm.Config{})
 }
