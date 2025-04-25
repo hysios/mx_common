@@ -1,8 +1,10 @@
 package common
 
 import (
+	"crypto/tls"
 	"fmt"
 
+	std_ck "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"gorm.io/driver/clickhouse"
@@ -13,7 +15,11 @@ import (
 	glogger "gorm.io/gorm/logger"
 )
 
+// For testing purposes
+var clickhouseOpenFunc = clickhouse.Open
+
 func OpenDatabaseVip() (*gorm.DB, error) {
+	// Load database configuration from environment variables
 	var (
 		prefix  = "database."
 		driver  = viper.GetString(prefix + "driver")
@@ -35,6 +41,7 @@ func OpenDatabaseVip() (*gorm.DB, error) {
 }
 
 func OpenMySQLVip(vip *viper.Viper) (*gorm.DB, error) {
+
 	var (
 		user        = vip.GetString("user")
 		pass        = vip.GetString("pass")
@@ -87,6 +94,7 @@ func OpenPostgresVip(vip *viper.Viper) (*gorm.DB, error) {
 }
 
 func OpenSQLiteVip(vip *viper.Viper) (*gorm.DB, error) {
+
 	var (
 		file = vip.GetString("file")
 	)
@@ -95,6 +103,7 @@ func OpenSQLiteVip(vip *viper.Viper) (*gorm.DB, error) {
 }
 
 func OpenRedisVip() *redis.Client {
+
 	return redis.NewClient(&redis.Options{
 		Network: viper.GetString("redis.network"),
 		Addr:    viper.GetString("redis.addr"),
@@ -112,10 +121,31 @@ func OpenClickhouseVip(vip *viper.Viper) (*gorm.DB, error) {
 		port    = vip.GetInt("port")
 		dbname  = vip.GetString("database")
 		timeout = vip.GetDuration("timeout")
-		read    = vip.GetDuration("read")
+		skipTLS = vip.GetBool("skipTLS")
+		debug   = vip.GetBool("debug")
 	)
 
-	dsn := fmt.Sprintf("clickhouse://%s:%s@%s:%d?%s&dial_timeout=%s&read_timeout=%s", host, port, user, pass, dbname, timeout, read)
+	sqlDB := std_ck.OpenDB(&std_ck.Options{
+		Addr: []string{fmt.Sprintf("%s:%d", host, port)},
+		Auth: std_ck.Auth{
+			Database: dbname,
+			Username: user,
+			Password: pass,
+		},
+		TLS: &tls.Config{
+			InsecureSkipVerify: skipTLS,
+		},
+		Settings: std_ck.Settings{
+			"max_execution_time": 60,
+		},
+		DialTimeout: timeout,
+		Debug:       debug,
+	})
+	if sqlDB == nil {
+		return nil, fmt.Errorf("failed to connect to ClickHouse")
+	}
 
-	return gorm.Open(clickhouse.Open(dsn), &gorm.Config{})
+	return gorm.Open(clickhouse.New(clickhouse.Config{
+		Conn: sqlDB, // initialize with existing database conn
+	}))
 }
