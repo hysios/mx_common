@@ -121,7 +121,7 @@ func OpenClickhouseVip(vip *viper.Viper) (*gorm.DB, error) {
 		port    = vip.GetInt("port")
 		dbname  = vip.GetString("database")
 		timeout = vip.GetDuration("timeout")
-		skipTLS = vip.GetBool("skipTLS")
+		skipTLS = vip.GetBool("skiptls")
 		debug   = vip.GetBool("debug")
 	)
 
