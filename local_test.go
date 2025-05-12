@@ -62,6 +62,8 @@ func TestOpenClickhouseVip(t *testing.T) {
 	vip.Set("host", os.Getenv("CLICKHOUSE_HOST"))
 	vip.Set("port", os.Getenv("CLICKHOUSE_PORT"))
 	vip.Set("database", os.Getenv("CLICKHOUSE_DATABASE"))
+	vip.Set("protocol", os.Getenv("CLICKHOUSE_PROTOCOL"))
+	vip.Set("skiptls", os.Getenv("CLICKHOUSE_SKIP_TLS"))
 	vip.Set("timeout", 30*time.Second)
 	vip.Set("read", 60*time.Second)
 

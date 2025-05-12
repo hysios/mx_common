@@ -115,18 +115,25 @@ func OpenRedisVip() *redis.Client {
 
 func OpenClickhouseVip(vip *viper.Viper) (*gorm.DB, error) {
 	var (
-		user    = vip.GetString("user")
-		pass    = vip.GetString("pass")
-		host    = vip.GetString("host")
-		port    = vip.GetInt("port")
-		dbname  = vip.GetString("database")
-		timeout = vip.GetDuration("timeout")
-		skipTLS = vip.GetBool("skiptls")
-		debug   = vip.GetBool("debug")
+		user     = vip.GetString("user")
+		pass     = vip.GetString("pass")
+		host     = vip.GetString("host")
+		port     = vip.GetInt("port")
+		dbname   = vip.GetString("database")
+		timeout  = vip.GetDuration("timeout")
+		skipTLS  = vip.GetBool("skiptls")
+		debug    = vip.GetBool("debug")
+		protocol = vip.GetString("protocol")
+		proto    = std_ck.Native
 	)
 
+	if protocol == "http" {
+		proto = std_ck.HTTP
+	}
+
 	sqlDB := std_ck.OpenDB(&std_ck.Options{
-		Addr: []string{fmt.Sprintf("%s:%d", host, port)},
+		Protocol: proto,
+		Addr:     []string{fmt.Sprintf("%s:%d", host, port)},
 		Auth: std_ck.Auth{
 			Database: dbname,
 			Username: user,
