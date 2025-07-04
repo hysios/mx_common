@@ -131,6 +131,13 @@ func OpenClickhouseVip(vip *viper.Viper) (*gorm.DB, error) {
 		proto = std_ck.HTTP
 	}
 
+	var tlsConfig *tls.Config
+	if protocol == "https" {
+		tlsConfig = &tls.Config{
+			InsecureSkipVerify: skipTLS,
+		}
+	}
+
 	sqlDB := std_ck.OpenDB(&std_ck.Options{
 		Protocol: proto,
 		Addr:     []string{fmt.Sprintf("%s:%d", host, port)},
@@ -139,9 +146,7 @@ func OpenClickhouseVip(vip *viper.Viper) (*gorm.DB, error) {
 			Username: user,
 			Password: pass,
 		},
-		TLS: &tls.Config{
-			InsecureSkipVerify: skipTLS,
-		},
+		TLS: tlsConfig,
 		Settings: std_ck.Settings{
 			"max_execution_time": 60,
 		},
