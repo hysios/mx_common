@@ -127,7 +127,7 @@ func OpenClickhouseVip(vip *viper.Viper) (*gorm.DB, error) {
 		proto    = std_ck.Native
 	)
 
-	if protocol == "http" {
+	if protocol == "http" || protocol == "https" {
 		proto = std_ck.HTTP
 	}
 
